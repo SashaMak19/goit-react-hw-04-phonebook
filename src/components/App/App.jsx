@@ -1,20 +1,20 @@
-import { Component } from 'react';
+import { useState } from 'react';
 import { nanoid } from 'nanoid';
 import { SectionForm } from '../SectionForm/SectionForm';
 import { SectionContacts } from '../SectionContacts/SectionContacts';
 import { Filter } from '../Filter/Filter';
 import styles from './app.module.css';
 import { initialContacts } from 'data/initial-contacts';
+import useLocalStorage from 'hooks/useLocalStorage';
 
-class App extends Component {
-  state = {
-    contacts: [...initialContacts],
-    filter: '',
-  };
+const App = () => {
+  const [contacts, setContacts] = useLocalStorage('contacts', [
+    ...initialContacts,
+  ]);
 
-  addContact = ({ name, number }) => {
-    const { contacts } = this.state;
+  const [filter, setFilter] = useState('');
 
+  const addContact = ({ name, number }) => {
     const newContact = {
       name,
       number,
@@ -28,49 +28,43 @@ class App extends Component {
       return alert(`${name} is already in contacs.`);
     }
 
-    this.setState(prevState => ({
-      contacts: [newContact, ...prevState.contacts],
-    }));
+    setContacts(prevState => [newContact, ...prevState]);
   };
 
-  onFilter = e => {
-    this.setState({ filter: e.currentTarget.value });
+  const onFilter = e => {
+    setFilter(e.currentTarget.value);
   };
 
-  getFilteredContacts = () => {
-    const { contacts, filter } = this.state;
+  const getFilteredContacts = () => {
     const filterToLowerCase = filter.toLowerCase();
+
     return contacts.filter(({ name }) =>
       name.toLowerCase().includes(filterToLowerCase)
     );
   };
 
-  onDeleteContact = deletedId => {
-    console.log(deletedId);
-    this.setState(prevState => ({
-      contacts: prevState.contacts.filter(contact => contact.id !== deletedId),
-    }));
+  const onDeleteContact = deletedId => {
+    setContacts(prevState =>
+      prevState.filter(contact => contact.id !== deletedId)
+    );
   };
 
-  render() {
-    const { filter } = this.state;
-    const filteredContacts = this.getFilteredContacts();
+  const filteredContacts = getFilteredContacts();
 
-    return (
-      <div className={styles.container}>
-        <h2 className={styles.title}>Phone book</h2>
-        <SectionForm onSubmit={this.addContact} />
-        <h2 className={styles.title}>Contacts</h2>
-        <div className={styles.contactListContainer}>
-          <Filter inputValue={filter} onChange={this.onFilter} />
-          <SectionContacts
-            contacts={filteredContacts}
-            onDelete={this.onDeleteContact}
-          />
-        </div>
+  return (
+    <div className={styles.container}>
+      <h2 className={styles.title}>Phone book</h2>
+      <SectionForm onSubmit={addContact} />
+      <h2 className={styles.title}>Contacts</h2>
+      <div className={styles.contactListContainer}>
+        <Filter inputValue={filter} onChange={onFilter} />
+        <SectionContacts
+          contacts={filteredContacts}
+          onDelete={onDeleteContact}
+        />
       </div>
-    );
-  }
-}
+    </div>
+  );
+};
 
 export { App };
