@@ -6,6 +6,7 @@ import { Filter } from '../Filter/Filter';
 import styles from './app.module.css';
 import { initialContacts } from 'data/initial-contacts';
 
+let garden;
 class App extends Component {
   state = {
     contacts: [...initialContacts],
