@@ -21,10 +21,11 @@ const App = () => {
       id: nanoid(),
     };
 
-    const existingContacts = contacts.map(({ name }) => name.toLowerCase());
-    const nameToLowerCase = name.toLowerCase();
+    const isExistingContact = contacts.find(
+      ({ name }) => name.toLowerCase() === newContact.name.toLowerCase()
+    );
 
-    if (existingContacts.includes(nameToLowerCase)) {
+    if (isExistingContact) {
       return alert(`${name} is already in contacs.`);
     }
 
